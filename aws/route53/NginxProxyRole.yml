@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an IAM Role for Nginx Management Proxy to access Route 53.
+
+Parameters:
+  DomainName:
+    Description: The registered domain name.
+    Type: String
+    ConstraintDescription: Please enter a registered domain name.
+
+  NginxProxyIPAddress:
+    Description: The IP Address where you host the Nginx Management Proxy.
+    Type: String
+    ConstraintDescription: Please enter the IP Address. 
+
+  NginxProxyTTL:
+    Description: Set the TTL (seconds) of the Nginx Management Proxy.
+    Type: Number
+    Default: 900
+
+Resources:
+  NginxManagementProxyRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: sts:AssumeRole
+      Path: '/'
+      MaxSessionDuration: 3600
+
+  NginxManagementProxyRolePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: 'Provide Nginx Management Proxy to access Route 53 Hosted Zones and Record Sets'
+      Path: '/'
+      Roles:
+        - !Ref NginxManagementProxyRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'route53:ListHostedZones'
+              - 'route53:ChangeResourceRecordSets'
+              - 'route53:GetChange'
+            Resource: '*'
+
+  NginxProxyARecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName : !Sub ${DomainName}.
+      Name: !Sub nginx.${DomainName}
+      ResourceRecords:
+      - !Sub ${NginxProxyIPAddress}
+      TTL: !Sub ${NginxProxyTTL}
+      Type: A
+
+  NginxProxyCNameRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName : !Sub ${DomainName}.
+      Name: !Sub '*.${DomainName}'
+      ResourceRecords:
+      - !Sub nginx.${DomainName}
+      TTL: !Sub ${NginxProxyTTL}
+      Type: CNAME

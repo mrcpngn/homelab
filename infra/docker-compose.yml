@@ -1,0 +1,55 @@
+version: '2.2' 
+services:
+  homer:
+    image: mrcpngn/homer
+    container_name: homer
+    volumes:
+      - homer_data:/www/assets
+    ports:
+      - 8080:8080
+    user: 1000:1000 # default
+    environment:
+      - INIT_ASSETS=1 # default
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 9443:9443
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    privileged: true
+    user: root
+    environment:
+      - JENKINS_OPTS="--httpPort=8000"
+    ports:
+      - 8000:8000
+      - 50000:50000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_data:/var/jenkins_home
+    restart: unless-stopped
+
+  nginxproxymanager:
+    image: 'jc21/nginx-proxy-manager:latest' 
+    container_name: nginxproxymanager
+    restart: unless-stopped 
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443' 
+    volumes:
+      - nginxproxymanager_data:/data
+      - nginxproxymanager_data:/etc/letsencrypt 
+
+volumes:
+  homer_data:
+  portainer_data:
+  jenkins_data:
+  nginxproxymanager_data:
