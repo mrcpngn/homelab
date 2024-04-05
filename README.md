@@ -106,16 +106,11 @@ Once you've met these prerequisites, your homelab will be ready for exploration 
         - Forward Hostname / IP: nginxproxymanager (more on that below)
         - Forward Port :81
 
-        ![Screenshot](screenshots/nginx-proxy-host-add.png)
-    
     - On the SSL, select the newly add SSL ```homelab.xyz``` and ```*.homelab.xyz```.
-
-        ![Screenshot](screenshots/nginx-proxy-host-ssl1.png)
-
     - Enable the ```Force SSL``` and ```HTTP/2 Support``` then click "Save".
 
-        ![Screenshot](screenshots/nginx-proxy-host-ssl2.png)
-
+        ![Screenshot](screenshots/nginx-proxy-host-add.png)
+    
     - Repeat for every application that you'd like to access with your new domain. 🌟
 
 ## Acknowledgment
