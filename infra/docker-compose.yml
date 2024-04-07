@@ -10,6 +10,7 @@ services:
     user: 1000:1000 # default
     environment:
       - INIT_ASSETS=1 # default
+    restart: unless-stopped
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -34,6 +35,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_data:/var/jenkins_home
+    restart: unless-stopped
+
+  jenkinsagent:
+    image: jenkins/ssh-agent:latest-alpine3.19-jdk21
+    container_name: jenkinsagent
+    environment:
+      JENKINS_AGENT_SSH_PUBKEY: |-
+        <HOST SSH PUBLIC KEY>
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - jenkins
     restart: unless-stopped
 
   nginxproxymanager:
