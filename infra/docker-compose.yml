@@ -10,6 +10,7 @@ services:
     user: 1000:1000 # default
     environment:
       - INIT_ASSETS=1 # default
+    restart: unless-stopped
 
   portainer:
     image: portainer/portainer-ce:latest
