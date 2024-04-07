@@ -37,6 +37,19 @@ services:
       - jenkins_data:/var/jenkins_home
     restart: unless-stopped
 
+  jenkinsagent:
+    image: jenkins/ssh-agent:latest-alpine3.19-jdk21
+    container_name: jenkinsagent
+    environment:
+      JENKINS_AGENT_SSH_PUBKEY: |-
+        <HOST SSH PUBLIC KEY>
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+
   nginxproxymanager:
     image: 'jc21/nginx-proxy-manager:latest' 
     container_name: nginxproxymanager
